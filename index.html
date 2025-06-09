@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мои задачи</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <style>
+    .done-task {
+      text-decoration: line-through;
+      color: grey;
+    }
+    .primary{
+      text-align: center;
+      width: 1200px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-app-bar app color="primary" dark>
+        <v-toolbar-title>Задачи на день</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="showAddDialog = true">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </v-app-bar>
+
+      <v-main>
+        <v-container>
+          <v-list>
+            <v-list-item v-for="(task, index) in tasks" :key="index">
+              <v-list-item-action>
+                <v-checkbox v-model="task.done"></v-checkbox>
+              </v-list-item-action>
+              <v-list-item-content :class="{ 'done-task': task.done }">
+                {{ task.text }}
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn icon @click="deleteTask(index)">
+                  <v-icon color="red">mdi-delete</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-container>
+      </v-main>
+
+      <v-dialog v-model="showAddDialog" max-width="500">
+        <v-card>
+          <v-card-title>Добавить задачу</v-card-title>
+          <v-card-text>
+            <v-text-field 
+              v-model="newTask" 
+              label="Новая задача" 
+              @keyup.enter="addTask"
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="showAddDialog = false">
+              Отмена
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="addTask">
+              Добавить
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="2000">
+        {{ snackbar.text }}
+      </v-snackbar>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: {
+        showAddDialog: false,
+        newTask: '',
+        tasks: [
+          { text: 'Изучить Vuetify', done: false },
+          { text: 'Создать приложение', done: true },
+          { text: 'Разместить на GitHub', done: false }
+        ],
+        snackbar: {
+          show: false,
+          text: '',
+          color: 'success'
+        }
+      },
+      methods: {
+        addTask() {
+          if (this.newTask.trim()) {
+            this.tasks.push({
+              text: this.newTask,
+              done: false
+            });
+            this.showAddDialog = false;
+            this.newTask = '';
+            this.showSnackbar('Задача добавлена!');
+          }
+        },
+        deleteTask(index) {
+          this.tasks.splice(index, 1);
+          this.showSnackbar('Задача удалена!', 'error');
+        },
+        showSnackbar(text, color = 'success') {
+          this.snackbar.text = text;
+          this.snackbar.color = color;
+          this.snackbar.show = true;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
